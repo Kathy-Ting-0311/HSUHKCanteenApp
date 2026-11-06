@@ -1,0 +1,10 @@
+{
+  "description": "Streamline your dining experience with a pre-order app designed for HSUHK students, enabling easy menu browsing, smart pickup scheduling, and real-time order tracking.",
+  "robots": {
+    "index": false
+  },
+  "accessibility": {
+    "addBypassLinks": false,
+    "ignoreReducedMotion": false
+  }
+}
