@@ -5,8 +5,21 @@
 
 > **Prototype notice:** this is an academic interaction prototype, not a production canteen system. There is no backend, no real payment integration and no HSUHK portal login. Accounts, preferences, favourites and order history live in the browser's `localStorage`; the cart is in-memory. Nothing is sent to a server.
 
+## Screenshots
+
+| Sign in | Home | Weekly menu |
+| :---: | :---: | :---: |
+| <img src="docs/screenshots/01-login.png" width="240" alt="QuickBite sign-in screen" /> | <img src="docs/screenshots/02-home.png" width="240" alt="Home screen with today's picks" /> | <img src="docs/screenshots/03-menu.png" width="240" alt="Weekly menu with day selector and search" /> |
+| **Dish details** | **Cart & queue forecast** | **Checkout** |
+| <img src="docs/screenshots/04-dish-detail.png" width="240" alt="Steamed Chicken Rice detail screen" /> | <img src="docs/screenshots/06-cart.png" width="240" alt="Cart with queue forecast and pickup slots" /> | <img src="docs/screenshots/07-checkout.png" width="240" alt="Checkout with Alipay HK and pay at counter" /> |
+| **Order confirmed** | **Order tracking** | **Pickup code** |
+| <img src="docs/screenshots/08-order-confirmed.png" width="240" alt="Order confirmation screen" /> | <img src="docs/screenshots/09-tracking.png" width="240" alt="Four-step order tracking screen" /> | <img src="docs/screenshots/10-pickup-code.png" width="240" alt="Pickup code and order number screen" /> |
+
+<sub>Captured from the local Vite build at a simulated Monday lunch service (12:05). The order number is generated per demo session.</sub>
+
 ## Contents
 
+- [Screenshots](#screenshots)
 - [Feature walkthrough](#feature-walkthrough)
 - [Screens](#screens)
 - [Tech stack](#tech-stack)
