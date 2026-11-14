@@ -114,6 +114,12 @@ const phrases: Record<string, ChinesePair> = {
   "Choose one soup": ["選擇一款湯", "选择一款汤"],
   "Coca-Cola": ["可樂", "可乐"],
   "Green tea": ["綠茶", "绿茶"],
+  "Daily soup of the day": ["例湯", "例汤"],
+  "Winter melon soup": ["冬瓜湯", "冬瓜汤"],
+  "Egg drop soup": ["蛋花湯", "蛋花汤"],
+  "Blanched kai-lan": ["白灼芥蘭", "白灼芥兰"],
+  "Braised tofu": ["滷水豆腐", "卤水豆腐"],
+  "Marinated cucumber": ["涼拌青瓜", "凉拌青瓜"],
   "Lemon tea": ["檸檬茶", "柠檬茶"],
   "Lemon water": ["檸檬水", "柠檬水"],
   "Dish + drink, soup & side": ["菜式 + 飲品、湯及小食", "菜品 + 饮品、汤及小食"],
@@ -161,6 +167,8 @@ const phrases: Record<string, ChinesePair> = {
   "Add a drink, soup & side dish": ["加配飲品、湯及小食", "加配饮品、汤及小食"],
   "Edit Profile": ["編輯", "编辑"],
   "Edit profile": ["編輯個人資料", "编辑个人资料"],
+  "User Name": ["用戶名稱", "用户名称"],
+  Email: ["電郵", "邮箱"],
   "Full Name": ["全名", "全名"],
   "Get assistance with ordering, payment or meal collection.": ["取得訂購、付款或取餐方面的協助。", "获取订购、付款或取餐方面的协助。"],
   "Pickup available period": ["可取餐時段", "可取餐时段"],
@@ -169,7 +177,7 @@ const phrases: Record<string, ChinesePair> = {
   "Closed for today": ["今日已結束", "今日已结束"],
   "Sorry, this dish is sold out and cannot be ordered right now. Please choose another dish.": ["抱歉，此菜式已售罄，暫時無法訂購，請選擇其他菜式。", "抱歉，此菜品已售罄，暂时无法订购，请选择其他菜品。"],
   "No favourites yet": ["暫無收藏", "暂无收藏"],
-  "Tap the heart on a dish to save it here.": ["點擊菜式上的心形圖示即可收藏。", "点击菜品上的心形图标即可收藏。"],
+  "Tap the star on a dish to save it here.": ["點擊菜式上的星形圖示即可收藏。", "点击菜品上的星形图标即可收藏。"],
   "Your saved dishes for quick reordering.": ["你收藏的菜式，方便快速再訂。", "你收藏的菜品，方便快速再订。"],
   "Save HK$1 / item": ["每份可減 HK$1", "每份可减 HK$1"],
   "Hello!": ["你好！", "你好！"],
@@ -408,6 +416,9 @@ const phrases: Record<string, ChinesePair> = {
   now: ["現在", "现在"],
   "Your order is ready!": ["你的訂單已備妥！", "你的订单已备妥！"],
   "Tap notification to collect →": ["點按通知取餐 →", "点击通知取餐 →"],
+  "Head to Stall 3 and show the QR code or pickup code to the staff.": ["前往 3 號檔口並向職員出示二維碼或取餐碼。", "前往 3 号档口并向工作人员出示二维码或取餐码。"],
+  "Scan QR Code": ["掃描二維碼", "扫描二维码"],
+  or: ["或", "或"],
   "Pickup Code": ["取餐碼", "取餐码"],
   "Your order is ready for pickup!": ["你的訂單已可取餐！", "你的订单已可取餐！"],
   "Head to Stall 3 and show this code to the staff.": ["前往 3 號檔口並向職員出示此碼。", "前往 3 号档口并向工作人员出示此码。"],
@@ -476,6 +487,17 @@ const attributeOriginals = new WeakMap<Element, Map<string, string>>()
 
 function translateExact(value: string, lang: Lang): string {
   if (lang === "en") return value
+  // Cart option lines such as "Soup: Winter melon soup" or comma-joined lists of them.
+  if (/(^|, )(Drink|Soup|Side|Remark): /.test(value)) {
+    const labels: Record<string, [string, string]> = { Drink: ["飲品", "饮品"], Soup: ["湯", "汤"], Side: ["小食", "小食"], Remark: ["備註", "备注"] }
+    return value.split(", ").map(part => {
+      const m = part.match(/^(Drink|Soup|Side|Remark): (.*)$/)
+      if (!m) return translateExact(part, lang)
+      const hm = m[2].match(/^(.*) \((Hot|Iced)\)$/)
+      const body = hm ? `${translateExact(hm[1], lang)}（${hm[2] === "Hot" ? (lang === "zh-Hant" ? "熱" : "热") : (lang === "zh-Hant" ? "凍" : "冻")}）` : translateExact(m[2], lang)
+      return `${labels[m[1]][lang === "zh-Hant" ? 0 : 1]}：${body}`
+    }).join("、")
+  }
   const pair = phrases[value] ?? normalizedPhrases.get(value.replace(/\s+/g, " ")) ?? reverseTraditional.get(value)
   if (pair) return pair[lang === "zh-Hant" ? 0 : 1]
 

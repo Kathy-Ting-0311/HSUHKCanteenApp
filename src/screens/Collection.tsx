@@ -6,131 +6,80 @@ import { StatusBar, TopBar, Btn, QRCode, StatusBanner } from '../components/ui'
 
 export function OrderCodeScreen() {
   const { state, navigate, goBack } = useApp()
-
-  return (
-    <div className="h-full flex flex-col bg-paper overflow-y-auto scrollbar-hide">
-      <StatusBar />
-      <TopBar title="Pickup Code" onBack={goBack} />
-
-      <div className="px-5 pt-4 pb-32 space-y-5">
-        {/* Ready banner */}
-        <StatusBanner
-          variant="success"
-          title="Your order is ready for pickup!"
-          body="Head to Stall 3 and show this code to the staff."
-        />
-
-        {/* Order # card */}
-        <div
-          className="rounded-[24px] p-6 text-center"
-          style={{ background: 'linear-gradient(160deg, #123D27 0%, #236B45 100%)' }}
-        >
-          <p className="text-white/60 text-[11px] uppercase tracking-widest font-bold mb-2">Order Number</p>
-          <p className="font-serif text-white text-[52px] font-semibold leading-none tracking-tight">
-            {state.orderNumber}
-          </p>
-          <div className="mt-4 flex gap-3">
-            <div className="flex-1 bg-white/10 rounded-[12px] px-3 py-2.5 text-center">
-              <div className="text-white/60 text-[10px] uppercase tracking-wide mb-0.5">Pickup slot</div>
-              <div className="text-white font-semibold text-[14px]">{state.selectedSlot?.time || '13:00'}</div>
-            </div>
-            <div className="flex-1 bg-white/10 rounded-[12px] px-3 py-2.5 text-center">
-              <div className="text-white/60 text-[10px] uppercase tracking-wide mb-0.5">Stall</div>
-              <div className="text-white font-semibold text-[14px]">No. 3</div>
-            </div>
-            <div className="flex-1 bg-white/10 rounded-[12px] px-3 py-2.5 text-center">
-              <div className="text-white/60 text-[10px] uppercase tracking-wide mb-0.5">Status</div>
-              <div className="text-green-400 font-semibold text-[14px]">Ready</div>
-            </div>
-          </div>
-        </div>
-
-        {/* Pickup code large display */}
-        <div className="bg-surface rounded-[20px] p-5 text-center" style={{ border: '2px solid #EAE1D9' }}>
-          <p className="text-[11px] font-bold uppercase tracking-widest text-ink-500 mb-3">4-digit Pickup Code</p>
-          <div className="flex gap-3 justify-center">
-            {['4', '8', '2', '7'].map((d, i) => (
-              <div key={i} className="w-14 h-16 bg-maroon-100 rounded-[14px] flex items-center justify-center">
-                <span className="font-serif text-[36px] font-semibold text-maroon-700">{d}</span>
-              </div>
-            ))}
-          </div>
-          <p className="text-[11px] text-ink-500 mt-3">Tell the staff this code or show it on screen</p>
-        </div>
-
-        {/* Items reminder */}
-        <div className="bg-surface rounded-[16px] p-4" style={{ border: '1px solid #EAE1D9' }}>
-          <div className="text-[11px] font-bold uppercase tracking-widest text-ink-500 mb-2">Your Order</div>
-          <div className="text-[13px] text-ink-900">1× Steamed Chicken Rice</div>
-        </div>
-
-        <Btn variant="primary" onClick={() => navigate('pickup-qr')}>
-          Show QR Code Instead
-        </Btn>
-      </div>
-    </div>
-  )
-}
-
-export function PickupQRScreen() {
-  const { state, navigate, goBack } = useApp()
   const [scanned, setScanned] = useState(false)
 
   return (
     <div className="h-full flex flex-col bg-paper overflow-y-auto scrollbar-hide">
       <StatusBar />
-      <TopBar title="Pickup QR" onBack={goBack} subtitle={state.orderNumber} />
+      <TopBar title="Pickup Code" onBack={goBack} subtitle={state.orderNumber} />
 
-      <div className="px-5 pt-4 pb-32 space-y-5">
+      <div className="px-5 pt-4 pb-32 space-y-4">
         {!scanned ? (
           <>
-            <div className="text-center">
-              <p className="text-[13px] text-ink-700 leading-relaxed">
-                Show this QR code to the scanner at Stall 3. The staff will hand over your meal after scanning.
-              </p>
-            </div>
+            <StatusBanner
+              variant="success"
+              title="Your order is ready for pickup!"
+              body="Head to Stall 3 and show the QR code or pickup code to the staff."
+            />
 
-            {/* QR code */}
-            <div className="bg-surface rounded-[24px] p-6 flex flex-col items-center" style={{ border: '2px solid #EAE1D9' }}>
-              <div className="mb-4">
-                <QRCode size={200} />
+            <div className="bg-surface rounded-[24px] p-5 flex flex-col items-center" style={{ border: '2px solid #EAE1D9' }}>
+              <p className="text-[11px] font-bold uppercase tracking-widest text-ink-500 mb-3">Scan QR Code</p>
+              <div className="relative">
+                <QRCode size={180} />
+                <div className="pointer-events-none absolute inset-0 overflow-hidden">
+                  <div
+                    className="absolute left-0 right-0 h-0.5 bg-maroon-700 opacity-60"
+                    style={{ animation: 'scan 2s ease-in-out infinite', top: 0 }}
+                  />
+                </div>
               </div>
-              <p className="font-serif text-[28px] font-semibold text-ink-900">{state.orderNumber}</p>
+
+              <div className="my-4 flex w-full items-center gap-3">
+                <div className="h-px flex-1 bg-line" />
+                <span className="text-[11px] font-semibold uppercase tracking-widest text-ink-500">or</span>
+                <div className="h-px flex-1 bg-line" />
+              </div>
+
+              <p className="text-[11px] font-bold uppercase tracking-widest text-ink-500 mb-3">4-digit Pickup Code</p>
+              <div className="flex gap-2.5 justify-center">
+                {['4', '8', '2', '7'].map((d, i) => (
+                  <div key={i} className="w-12 h-14 bg-maroon-100 rounded-[12px] flex items-center justify-center">
+                    <span className="font-serif text-[32px] font-semibold text-maroon-700">{d}</span>
+                  </div>
+                ))}
+              </div>
+              <p className="font-serif text-[22px] font-semibold text-ink-900 mt-4">{state.orderNumber}</p>
               <p className="text-[11px] text-ink-500 mt-1">Valid until 13:15 · Stall 3</p>
+            </div>
 
-              {/* Scanner animation */}
-              <div className="relative mt-4 w-[200px] h-[200px] -mt-[200px] pointer-events-none">
-                <div
-                  className="absolute left-0 right-0 h-0.5 bg-maroon-700 opacity-60"
-                  style={{ animation: 'scan 2s ease-in-out infinite', top: 0 }}
-                />
+            <div className="flex gap-3">
+              <div className="flex-1 bg-surface rounded-[12px] px-3 py-2.5 text-center" style={{ border: '1px solid #EAE1D9' }}>
+                <div className="text-ink-500 text-[10px] uppercase tracking-wide mb-0.5">Pickup slot</div>
+                <div className="text-ink-900 font-semibold text-[14px]">{state.selectedSlot?.time || '13:00'}</div>
+              </div>
+              <div className="flex-1 bg-surface rounded-[12px] px-3 py-2.5 text-center" style={{ border: '1px solid #EAE1D9' }}>
+                <div className="text-ink-500 text-[10px] uppercase tracking-wide mb-0.5">Stall</div>
+                <div className="text-ink-900 font-semibold text-[14px]">No. 3</div>
+              </div>
+              <div className="flex-1 bg-surface rounded-[12px] px-3 py-2.5 text-center" style={{ border: '1px solid #EAE1D9' }}>
+                <div className="text-ink-500 text-[10px] uppercase tracking-wide mb-0.5">Status</div>
+                <div className="text-green-600 font-semibold text-[14px]">Ready</div>
               </div>
             </div>
 
-            {/* Simulate scan */}
+            <div className="bg-surface rounded-[16px] p-4" style={{ border: '1px solid #EAE1D9' }}>
+              <div className="text-[11px] font-bold uppercase tracking-widest text-ink-500 mb-2">Your Order</div>
+              <div className="text-[13px] text-ink-900">1× Steamed Chicken Rice</div>
+            </div>
+
             <button
               onClick={() => setScanned(true)}
               className="w-full py-2.5 rounded-[14px] bg-green-100 text-green-600 text-[13px] font-semibold active:opacity-70"
             >
               Simulate Staff Scan
             </button>
-
-            <div className="bg-surface rounded-[16px] p-4" style={{ border: '1px solid #EAE1D9' }}>
-              <div className="flex items-center gap-2">
-                <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                  <circle cx="7" cy="7" r="6.5" stroke="#8A7D78" />
-                  <path d="M7 4v4l2 2" stroke="#8A7D78" strokeWidth="1.2" strokeLinecap="round" />
-                </svg>
-                <span className="text-[11px] text-ink-500">QR expires in <strong className="text-ink-700">14:23</strong></span>
-              </div>
-            </div>
-
-            <Btn variant="outline" onClick={() => navigate('order-code')}>
-              Use Number Code Instead
-            </Btn>
           </>
         ) : (
-          /* Post-scan collected view */
           <div className="flex flex-col items-center text-center pt-4">
             <div className="w-20 h-20 rounded-full bg-green-100 flex items-center justify-center mb-5">
               <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
@@ -158,6 +107,9 @@ export function PickupQRScreen() {
     </div>
   )
 }
+
+// The QR and number code now share one screen; keep the old route working.
+export const PickupQRScreen = OrderCodeScreen
 
 export function CollectedScreen() {
   const { navigate, markCurrentOrderCollected } = useApp()

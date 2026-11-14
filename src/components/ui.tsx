@@ -1,6 +1,7 @@
 import { HKClock } from '../hkTime'
 import { useApp } from '../context'
 import React from 'react'
+import Icon from './Icon'
 import type { FoodItem, TimeSlot } from '../types'
 import { LanguageToggle } from './Languagetoggle'
 import { LocalizedContent } from '../Language/i18n'
@@ -192,6 +193,8 @@ interface FoodCardProps {
 }
 
 export function FoodCard({ item, onPress, disabled = false }: FoodCardProps) {
+  const { state, toggleFavorite } = useApp()
+  const isFav = state.favorites.includes(item.id)
   const unavailable = item.soldOut || disabled
   const showSoldOut = item.soldOut && !disabled
 
@@ -228,8 +231,18 @@ export function FoodCard({ item, onPress, disabled = false }: FoodCardProps) {
         alt={item.name}
         className="pointer-events-none absolute inset-y-0 left-0 h-full w-[38%] object-cover"
       />
+      <button
+        type="button"
+        onClick={e => { e.stopPropagation(); toggleFavorite(item.id) }}
+        onKeyDown={e => e.stopPropagation()}
+        aria-pressed={isFav}
+        aria-label={isFav ? 'Remove from Favourites' : 'Add to Favourites'}
+        className={`absolute right-2 top-2 z-10 flex h-8 w-8 items-center justify-center rounded-full border bg-white active:opacity-70 ${isFav ? 'border-amber-500 text-amber-500' : 'border-line text-ink-500'}`}
+      >
+        <Icon name="star" size={18} fill={isFav} />
+      </button>
       <div className="relative ml-[calc(38%+16px)] min-w-0 flex flex-col py-0.5">
-        <div className="flex items-start justify-between gap-2">
+        <div className="flex items-start justify-between gap-2 pr-7">
           <div className="min-w-0">
             <div className="text-[14px] font-semibold text-ink-900 leading-snug">{item.name}</div>
             <div className={`font-serif text-[15px] font-semibold ${showSoldOut ? 'text-ink-500 line-through' : 'text-maroon-700'}`}>HK${item.price}</div>

@@ -122,7 +122,7 @@ export function LoginScreen() {
 
 export function SignupScreen() {
   const { navigate, goBack, signIn } = useApp()
-  const [f, setF] = useState({ name: "", studentId: "", email: "", pw: "", pw2: "" })
+  const [f, setF] = useState({ name: "", email: "", pw: "", pw2: "" })
   const [error, setError] = useState("")
   const [busy, setBusy] = useState(false)
 
@@ -133,21 +133,20 @@ export function SignupScreen() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    if (!f.name.trim() || !f.studentId.trim() || !f.email.trim() || !f.pw) return setError("Please fill in all fields.")
+    if (!f.name.trim() || !f.email.trim() || !f.pw) return setError("Please fill in all fields.")
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(f.email.trim())) return setError("Please enter a valid email address.")
     if (f.pw.length < 6) return setError("Password must be at least 6 characters.")
     if (f.pw !== f.pw2) return setError("Passwords do not match.")
     setBusy(true)
-    const res = await registerUser({ name: f.name, studentId: f.studentId, email: f.email, password: f.pw })
+    const res = await registerUser({ name: f.name, studentId: "", email: f.email, password: f.pw })
     setBusy(false)
     if (res.user) signIn(res.user)
     else setError(res.error ?? "Could not create account.")
   }
 
   const fields: { key: keyof typeof f; label: string; type: string; placeholder: string; auto: string }[] = [
-    { key: "name", label: "Full Name", type: "text", placeholder: "Chan Tai Man", auto: "name" },
-    { key: "studentId", label: "Student ID", type: "text", placeholder: "S12345678A", auto: "off" },
-    { key: "email", label: "University Email", type: "email", placeholder: "your@hsu.edu.hk", auto: "email" },
+    { key: "name", label: "User Name", type: "text", placeholder: "Chan Tai Man", auto: "username" },
+    { key: "email", label: "Email", type: "email", placeholder: "your@email.com", auto: "email" },
     { key: "pw", label: "Password", type: "password", placeholder: "At least 6 characters", auto: "new-password" },
     { key: "pw2", label: "Confirm Password", type: "password", placeholder: "Re-enter password", auto: "new-password" },
   ]
@@ -389,9 +388,8 @@ export function ProfileSubScreen({ page }: { page: ProfilePage }) {
               <p className="mt-3 text-[13px] text-ink-500">Your HSUHK account details</p>
             </div>
             <ProfileCard>
-              <DetailRow label="Full Name" value={state.user?.name ?? "Chan Tai Man"} />
-              <DetailRow label="Student ID" value={state.user?.studentId ?? "S12345678A"} />
-              <DetailRow label="University Email" value={state.user?.email ?? "student@hsu.edu.hk"} />
+              <DetailRow label="User Name" value={state.user?.name ?? "Chan Tai Man"} />
+              <DetailRow label="Email" value={state.user?.email ?? "student@hsu.edu.hk"} />
             </ProfileCard>
             <div className="rounded-[14px] bg-amber-100 px-4 py-3 text-[12px] leading-relaxed text-ink-700">
               Profile details are linked to your local HSUHK account and stay available after refresh.
@@ -404,9 +402,9 @@ export function ProfileSubScreen({ page }: { page: ProfilePage }) {
             <p className="px-1 text-[12px] leading-relaxed text-ink-500">Your saved dishes for quick reordering.</p>
             {favoriteItems.length === 0 && (
               <div className="rounded-[16px] border border-line bg-surface px-4 py-8 text-center">
-                <Icon name="heart" size={28} />
+                <Icon name="star" size={28} />
                 <p className="mt-2 text-[14px] font-semibold text-ink-900">No favourites yet</p>
-                <p className="mt-1 text-[12px] leading-relaxed text-ink-500">Tap the heart on a dish to save it here.</p>
+                <p className="mt-1 text-[12px] leading-relaxed text-ink-500">Tap the star on a dish to save it here.</p>
               </div>
             )}
             {favoriteItems.map(item => (
@@ -435,7 +433,6 @@ export function ProfileSubScreen({ page }: { page: ProfilePage }) {
           <div className="space-y-4">
             <ProfileCard>
               <DetailRow label="Signed in as" value={state.user?.email ?? "Local QuickBite account"} />
-              <DetailRow label="Student ID" value={state.user?.studentId ?? "S12345678A"} />
             </ProfileCard>
             <div>
               <p className="mb-2 px-1 text-[11px] font-bold uppercase tracking-widest text-ink-500">Payment</p>

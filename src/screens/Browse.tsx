@@ -313,9 +313,9 @@ export function FoodDetailScreen() {
             onClick={() => toggleFavorite(item.id)}
             aria-pressed={state.favorites.includes(item.id)}
             aria-label={state.favorites.includes(item.id) ? 'Remove from Favourites' : 'Add to Favourites'}
-            className={`ml-2 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full border active:opacity-70 ${state.favorites.includes(item.id) ? 'border-maroon-700 bg-maroon-100 text-maroon-700' : 'border-line bg-surface text-ink-500'}`}
+            className={`ml-2 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full border active:opacity-70 ${state.favorites.includes(item.id) ? 'border-amber-500 bg-amber-100 text-amber-500' : 'border-line bg-surface text-ink-500'}`}
           >
-            <Icon name="heart" size={20} fill={state.favorites.includes(item.id)} />
+            <Icon name="star" size={20} fill={state.favorites.includes(item.id)} />
           </button>
           <span className="font-serif text-[28px] font-semibold text-maroon-700 ml-3">HK${item.price}</span>
         </div>
