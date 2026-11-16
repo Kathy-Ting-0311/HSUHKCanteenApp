@@ -303,6 +303,7 @@ const phrases: Record<string, ChinesePair> = {
   "Service fee": ["服務費", "服务费"],
   Total: ["總計", "总计"],
   "Choose Pickup Time →": ["選擇取餐時間 →", "选择取餐时间 →"],
+  "An item in your cart just sold out while you were shopping. Please choose an alternative.": ["購物車內有菜式剛剛售罄，請選擇其他菜式。", "购物车内有菜品刚刚售罄，请选择其他菜品。"],
   "Item sold out": ["菜式已售罄", "菜品已售罄"],
   "BBQ Pork Rice Box just sold out while you were shopping. Please choose an alternative.": ["叉燒飯剛剛售罄，請選擇其他菜式。", "叉烧饭刚刚售罄，请选择其他菜品。"],
   "See Alternatives": ["查看替代選擇", "查看替代选择"],
@@ -487,6 +488,8 @@ const attributeOriginals = new WeakMap<Element, Map<string, string>>()
 
 function translateExact(value: string, lang: Lang): string {
   if (lang === "en") return value
+  const replacing = value.match(/^Replacing (.+)$/)
+  if (replacing) return `${lang === "zh-Hant" ? "替代" : "替代"}${translateExact(replacing[1], lang)}`
   // Cart option lines such as "Soup: Winter melon soup" or comma-joined lists of them.
   if (/(^|, )(Drink|Soup|Side|Remark): /.test(value)) {
     const labels: Record<string, [string, string]> = { Drink: ["飲品", "饮品"], Soup: ["湯", "汤"], Side: ["小食", "小食"], Remark: ["備註", "备注"] }

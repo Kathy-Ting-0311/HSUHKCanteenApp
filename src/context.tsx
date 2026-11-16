@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useCallback } from 'react'
 import type { Screen, AppState, FoodItem, OrderMode, CartOption, TimeSlot } from './types'
-import { generateOrderNumber } from './data'
+import { generateOrderNumber, FOOD_ITEMS } from './data'
 import { todayText } from './hkTime'
 import { loadSession, orderHistoryKey, saveSession } from './auth'
 import type { User } from './auth'
@@ -44,6 +44,7 @@ interface AppContextType {
   signIn: (user: User) => void
   signOut: () => void
   toggleFavorite: (foodId: string) => void
+  replaceCartItem: (lineId: string, food: FoodItem | null) => void
 }
 
 export const TABLEWARE_FEE = 1
@@ -92,7 +93,22 @@ function readHistory(user: User | null) {
 export function AppProvider({ children }: { children: React.ReactNode }) {
   const [state, setState] = useState<AppState>(() => {
     const user = loadSession()
-    return { ...initialState, user, history: [user ? 'home' : 'login'], orderHistory: readHistory(user), favorites: readFavorites(user) }
+    const base = { ...initialState, user, history: [user ? 'home' : 'login'] as Screen[], orderHistory: readHistory(user), favorites: readFavorites(user) }
+    // Preview helper: ?screen=<name> opens a screen directly with demo data (used for image export).
+    const target = new URLSearchParams(window.location.search).get('screen') as Screen | null
+    if (!target) return base
+    const food = FOOD_ITEMS[1]
+    return {
+      ...base,
+      user: user ?? { name: 'Guest', studentId: '', email: 'guest@quickbite.local' },
+      history: [target],
+      selectedFood: food,
+      selectedSlot: { time: '12:45', label: '12:45', busy: false, queueLength: 4 },
+      cart: [
+        { lineId: `${food.id}:alacarte::0`, mode: 'alacarte', food, quantity: 1, notes: '', extraPrice: 0, options: [] },
+        { lineId: `${FOOD_ITEMS[0].id}:alacarte::0`, mode: 'alacarte', food: FOOD_ITEMS[0], quantity: 1, notes: '', extraPrice: 0, options: [] },
+      ],
+    }
   })
 
   const signIn = useCallback((user: User) => {
@@ -263,6 +279,24 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     })
   }, [])
 
+  // Swap (or drop, when food is null) a cart line, then return to the cart page.
+  const replaceCartItem = useCallback((lineId: string, food: FoodItem | null) => {
+    setState(s => {
+      const old = s.cart.find(c => c.lineId === lineId)
+      if (!old) return s
+      let cart = s.cart.filter(c => c.lineId !== lineId)
+      if (food) {
+        const swapped = { ...old, food, lineId: `${food.id}:alacarte:swap:${old.extraPrice}`, mode: 'alacarte' as OrderMode, notes: '', extraPrice: 0, options: [] as CartOption[] }
+        const i = cart.findIndex(c => c.lineId === swapped.lineId)
+        if (i >= 0) cart = cart.map((c, k) => k === i ? { ...c, quantity: c.quantity + old.quantity } : c)
+        else cart = [...cart, swapped]
+      }
+      const at = s.history.lastIndexOf('cart')
+      const history = at >= 0 ? s.history.slice(0, at + 1) : [...s.history, 'cart' as const]
+      return { ...s, cart, history }
+    })
+  }, [])
+
   const setTableware = useCallback((need: boolean) => {
     setState(s => ({ ...s, tableware: need }))
   }, [])
@@ -282,7 +316,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       setSelectedFood, setSelectedSlot, setTrackingStep,
       setPaymentMethod, clearCart, prepareOrder, completeOrder, markCurrentOrderCollected,
       cartTotal, itemsTotal, extrasFee, tablewareFee, setTableware, cartCount,
-      signIn, signOut, toggleFavorite,
+      signIn, signOut, toggleFavorite, replaceCartItem,
     }}>
       {children}
     </AppContext.Provider>

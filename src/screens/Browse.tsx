@@ -651,7 +651,10 @@ export function CartScreen() {
 }
 
 export function CartSoldOutScreen() {
-  const { navigate, goBack } = useApp()
+  const { state, navigate, goBack, replaceCartItem } = useApp()
+  const soldLine = state.cart[0]
+  if (!soldLine) return null
+  const others = state.cart.slice(1)
 
   return (
     <div className="h-full flex flex-col bg-paper overflow-y-auto scrollbar-hide">
@@ -662,41 +665,43 @@ export function CartSoldOutScreen() {
         <StatusBanner
           variant="error"
           title="Item sold out"
-          body="BBQ Pork Rice Box just sold out while you were shopping. Please choose an alternative."
+          body="An item in your cart just sold out while you were shopping. Please choose an alternative."
         />
 
         {/* Sold out item */}
         <div className="mt-4 bg-surface rounded-[20px] p-4 opacity-50" style={{ border: '1px solid #EAE1D9' }}>
           <div className="flex gap-3">
             <div className="relative w-16 h-16">
-              <FoodImg src={FOOD_ITEMS[0].image} alt="BBQ Pork" className="w-full h-full object-cover food-plate rounded-full bg-amber-100" />
-              <div className="absolute inset-0 bg-black/40 rounded-[12px] flex items-center justify-center">
+              <FoodImg src={soldLine.food.image} alt={soldLine.food.name} className="w-full h-full object-cover food-plate rounded-full bg-amber-100" />
+              <div className="absolute inset-0 bg-black/40 rounded-full flex items-center justify-center">
                 <span className="text-white text-[9px] font-bold uppercase">Sold out</span>
               </div>
             </div>
             <div>
-              <div className="text-[14px] font-semibold text-ink-900 line-through">BBQ Pork Rice Box</div>
-              <div className="font-serif text-[16px] text-ink-500 line-through">HK$42</div>
+              <div className="text-[14px] font-semibold text-ink-900 line-through">{soldLine.food.name}</div>
+              <div className="font-serif text-[16px] text-ink-500 line-through">HK${soldLine.food.price}</div>
             </div>
           </div>
         </div>
 
         {/* Other cart items remain */}
-        <div className="mt-4 bg-surface rounded-[20px] p-4" style={{ border: '1px solid #EAE1D9' }}>
-          <div className="flex gap-3">
-            <FoodImg src={FOOD_ITEMS[1].image} alt="Chicken Rice" className="w-16 h-16 object-cover food-plate rounded-full bg-amber-100" />
-            <div>
-              <div className="text-[14px] font-semibold text-ink-900">Steamed Chicken Rice</div>
-              <div className="font-serif text-[16px] font-semibold text-maroon-700 mt-1">HK$40</div>
+        {others.map(line => (
+          <div key={line.lineId} className="mt-4 bg-surface rounded-[20px] p-4" style={{ border: '1px solid #EAE1D9' }}>
+            <div className="flex gap-3">
+              <FoodImg src={line.food.image} alt={line.food.name} className="w-16 h-16 object-cover food-plate rounded-full bg-amber-100" />
+              <div>
+                <div className="text-[14px] font-semibold text-ink-900">{line.food.name}</div>
+                <div className="font-serif text-[16px] font-semibold text-maroon-700 mt-1">HK${line.food.price}</div>
+              </div>
             </div>
           </div>
-        </div>
+        ))}
 
         <div className="mt-5 space-y-3">
           <Btn variant="primary" onClick={() => navigate('alternatives')}>
             See Alternatives
           </Btn>
-          <Btn variant="outline" onClick={() => navigate('pickup-time')}>
+          <Btn variant="outline" onClick={() => replaceCartItem(soldLine.lineId, null)}>
             Continue Without It
           </Btn>
         </div>
@@ -706,13 +711,15 @@ export function CartSoldOutScreen() {
 }
 
 export function AlternativesScreen() {
-  const { navigate, goBack } = useApp()
-  const alts = FOOD_ITEMS.filter(f => !f.soldOut && f.id !== '1').slice(0, 3)
+  const { state, goBack, replaceCartItem } = useApp()
+  const soldLine = state.cart[0]
+  if (!soldLine) return null
+  const alts = FOOD_ITEMS.filter(f => !f.soldOut && f.id !== soldLine.food.id).slice(0, 3)
 
   return (
     <div className="h-full flex flex-col bg-paper overflow-y-auto scrollbar-hide">
       <StatusBar />
-      <TopBar title="Alternatives" subtitle="Replacing BBQ Pork Rice Box" onBack={goBack} />
+      <TopBar title="Alternatives" subtitle={`Replacing ${soldLine.food.name}`} onBack={goBack} />
 
       <div className="px-4 pt-3 pb-8 space-y-3">
         <StatusBanner
@@ -724,7 +731,7 @@ export function AlternativesScreen() {
         {alts.map(item => (
           <button
             key={item.id}
-            onClick={() => navigate('pickup-time')}
+            onClick={() => replaceCartItem(soldLine.lineId, item)}
             className="w-full flex gap-3 p-3 bg-surface rounded-[20px] text-left active:opacity-70"
             style={{ border: '2px solid transparent' }}
             onMouseDown={e => (e.currentTarget.style.borderColor = '#236B45')}
